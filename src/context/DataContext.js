@@ -1,27 +1,24 @@
-import { Routes , Route, useNavigate} from "react-router-dom";
-import About from "./About";
-import Footer from "./Footer";
-import Header from "./Header";
-import Home from "./Home";
-import Missing from "./Missing";
-import Nav from "./Nav";
-import NewPost from "./NewPost";
-import PostPage from "./PostPage";
+import { createContext } from "react"
+// import PostLayout from "../PostLayout";
 import { useEffect, useState } from "react";
 import { format } from 'date-fns'
-import api from './api/posts'
-import EditPost from "./EditPost";
-import useWindowSize from "./Hooks/useWindowSize";
-import useAxiosFetch from "./Hooks/useAxiosFetch";
+import api from '../api/posts'
+// import EditPost from "../EditPost";
+import useWindowSize from "../Hooks/useWindowSize";
+import useAxiosFetch from "../Hooks/useAxiosFetch";
+import { useNavigate } from "react-router-dom";
 
-function App() {
-  
+const DataContext = createContext({})
+
+export const DataProvider = ({Children}) => {
+      
   const[posts , setPosts] = useState([])
 
   const [search , setSearch] = useState('')
   const [postTitle , setPostTitle] = useState('')
   const [postBody , setPostBody] = useState('')
   const [searchResult , setSearchResult] = useState([])
+  // const [fetchError , setFetchError] = useState(null)
   const [editTitle , setEditTitle] = useState('')
   const [editBody , setEditBody] = useState('')
   const navigate = useNavigate();
@@ -35,8 +32,19 @@ function App() {
     setPosts(data)
   }, [data])
 
+  // useEffect(()=>{
+  //   const fetchPosts = async()=>{
+  //     try{
+  //       const response = await api.get('posts')
+  //       setPosts(response.data)
+  //       setFetchError(null)
+  //     }catch(err){
+  //       setFetchError(err.message)
+  //     }
+  //   }
+  //   fetchPosts()
+  // },[])
 
-  // Search Element
   useEffect(() => {
     const filter = posts.filter((elements) => 
       (((elements.title).toUpperCase()).includes(search.toUpperCase())) ||
@@ -47,7 +55,6 @@ function App() {
   }, [posts , search])
 
 
-  // NewPost Submit
   const handleSubmit = async(e) => {
     e.preventDefault()
     const idNum = posts.length ? Number(posts[posts.length - 1].id) + 1 : 1;
@@ -64,7 +71,6 @@ function App() {
     navigate('/')
   }
 
-  // Edit Post
   const handleEdit = async(id)=>{
     const datetime = format(new Date() , 'MMM dd, yyyy pp')
     const updateItems = { id , title: editTitle , datetime , body: editBody}
@@ -79,7 +85,6 @@ function App() {
     }
   }
 
-  // Delete Post
   const handleDelete = async (id) => {
     try {
       // console.log(typeof(id) , id); // Should log 'number'
@@ -91,48 +96,15 @@ function App() {
       console.error(err.message);
     }
   };
-  return (
-    <div className="App">
-      <Header title="KeEp NoTeS" width = {width}/>
-        <Nav 
-        search = {search}
-        setSearch = {setSearch}
-        />
-        <Routes>
-          <Route path="/" element={
-            <Home
-              posts = {searchResult}
-              fetchErrors = {fetchErrors}
-              isLoading = {isLoading}
-            />}
-          />
-            <Route path="newpost" element = {<NewPost
-              handleSubmit = {handleSubmit}
-              postTitle = {postTitle}
-              setPostTitle ={setPostTitle}
-              setPostBody = {setPostBody}
-              postBody ={postBody} />
-            }/>
-          <Route path="post">
-            <Route path=":id" element = {<PostPage
-              posts = {posts}
-              handleDelete = {handleDelete}/>
-            }/>
-          </Route>
-          <Route path="/edit/:id" element= {<EditPost
-            posts = {posts}
-            editTitle = {editTitle}
-            editBody = {editBody} 
-            setEditTitle = {setEditTitle} 
-            setEditBody = {setEditBody} 
-            handleEdit = {handleEdit}/>
-          }/>
-        <Route path="about" element = {<About/>}/>
-        <Route path="*" element = {<Missing/>}/>
-        </Routes>
-      <Footer />
-    </div>
-  );
+  
+
+    return(
+        <DataContext.Provider value={{
+            width, search , setSearch , searchResult,setPosts,fetchErrors , isLoading , postBody , setPostBody , postTitle , setPostTitle , handleSubmit, editTitle , editBody , setEditTitle , setEditBody , handleEdit ,handleDelete
+        }}>
+            {Children}
+        </DataContext.Provider>
+    )
 }
 
-  export default App;
+export default DataContext;
