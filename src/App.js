@@ -17,7 +17,6 @@ import useAxiosFetch from "./Hooks/useAxiosFetch";
 function App() {
   
   const[posts , setPosts] = useState([])
-
   const [search , setSearch] = useState('')
   const [postTitle , setPostTitle] = useState('')
   const [postBody , setPostBody] = useState('')

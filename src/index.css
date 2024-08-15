@@ -282,3 +282,14 @@ body {
   }
 
 }
+
+.edit{
+  width: 100%;
+  /* background-color: #b7f566; */
+  /* border: 2px solid black ; */
+  text-decoration: underline;
+  padding: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
